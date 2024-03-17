@@ -28,5 +28,5 @@ coverage
 *.sln
 *.sw?
 
-/UI/chat_web_ui/node_modules/*
+UI/chat_web_ui/node_modules/*
 
