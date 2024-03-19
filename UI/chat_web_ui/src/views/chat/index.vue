@@ -386,6 +386,7 @@ function handleClear() {
   })
 }
 
+//如果按enter 按鈕也會發送這個消息
 function handleEnter(event: KeyboardEvent) {
   if (!isMobile.value) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -543,6 +544,7 @@ onUnmounted(() => {
               />
             </template>
           </NAutoComplete>
+          <!--这是处理发送的按钮  handleSubmit调用这个函数-->
           <NButton type="primary" :disabled="buttonDisabled" @click="handleSubmit">
             <template #icon>
               <span class="dark:text-black">
