@@ -89,19 +89,6 @@ async function onConversation() {
   if (lastContext && usingContext.value)
     options = { ...lastContext }
 
-  addChat(
-    +uuid,
-    {
-      dateTime: new Date().toLocaleString(),
-      text: t('chat.thinking'),
-      loading: true,
-      inversion: false,
-      error: false,
-      conversationOptions: null,
-      requestOptions: { prompt: message, options: { ...options } },
-    },
-  )
-  scrollToBottom()
 
   try {
     let lastText = ''
@@ -113,8 +100,23 @@ async function onConversation() {
         onDownloadProgress: ({ event }) => {
           const xhr = event.target
           const { responseText } = xhr
+
+          addChat(
+            +uuid,
+            {
+              dateTime: new Date().toLocaleString(),
+              text: responseText,
+              loading: true,
+              inversion: false,
+              error: false,
+              conversationOptions: null,
+              requestOptions: { prompt: message, options: { ...options } },
+            },
+          )
+          scrollToBottom()
           // Always process the final line
-          const lastIndex = responseText.lastIndexOf('\n', responseText.length - 2)
+          /*
+                    const lastIndex = responseText.lastIndexOf('\n', responseText.length - 2)
           let chunk = responseText
           if (lastIndex !== -1)
             chunk = responseText.substring(lastIndex)
@@ -134,7 +136,8 @@ async function onConversation() {
               },
             )
 
-            if (openLongReply && data.detail.choices[0].finish_reason === 'length') {
+            //openLongReply && 
+            if (data.detail.choices[0].finish_reason === 'length') {
               options.parentMessageId = data.id
               lastText = data.text
               message = ''
@@ -146,6 +149,7 @@ async function onConversation() {
           catch (error) {
             //
           }
+          */
         },
       })
       updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })

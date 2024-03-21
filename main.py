@@ -33,7 +33,21 @@ async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
 
+def is_not_empty_string(s):
+    return isinstance(s, str) and bool(s.strip())
+
+def current_model():
+    # 假设此处有获取当前模型的逻辑
+    return "ChatGPTAPI"
+
+@app.post("/session")
+async def create_session():
+        has_auth = is_not_empty_string(app.state.api_key)
+        return {"status": "Success", "message": "", "data": {"auth": has_auth, "model": current_model()}}
+
+
+
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run("main:app", reload=True, host="0.0.0.0", port=12003)
+    uvicorn.run("main:app", reload=True, host="127.0.0.1", port=3002)
