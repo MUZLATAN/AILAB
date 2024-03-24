@@ -116,3 +116,23 @@ async def translate(inp: str = Query(...), lang: str = Query("en")):
         "model": "text-davinci-002"
     }
     return (await request(url, data)).get("choices")[0]
+
+
+res_arr=[
+    "hahahhahah",
+    "xkxixixixi",
+    "dkdkfjdkfkdf"
+    "[DONE]"
+]
+
+@router.websocket("chat-websocket")
+async def chat_websocket(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            resp = res_arr
+            for res in resp:
+                await websocket.send_text(resp)
+    except WebSocketDisconnect:
+        return

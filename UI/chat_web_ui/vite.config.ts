@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
+
 function setupPlugins(env: ImportMetaEnv): PluginOption[] {
   return [
     vue(),
