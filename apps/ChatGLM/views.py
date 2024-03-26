@@ -119,20 +119,46 @@ async def translate(inp: str = Query(...), lang: str = Query("en")):
 
 
 res_arr=[
-    "hahahhahah",
+    "[BEG]hahahhahah",
     "xkxixixixi",
     "dkdkfjdkfkdf"
     "[DONE]"
 ]
 
-@router.websocket("chat-websocket")
+
+
+@router.websocket("/chat_websocket")
 async def chat_websocket(websocket: WebSocket):
-    await websocket.accept()
     try:
+        await websocket.accept()
+        message = list()
         while True:
+            # await 将这个函数变成一个task， 然后event loop 会执行websocket.receive_text()
+            # websocket.receive_text()执行完成之后，await显示的将程序控制权还给event loop
             data = await websocket.receive_text()
-            resp = res_arr
-            for res in resp:
-                await websocket.send_text(resp)
+            print(data)
+
+            if data == "quit":
+                await websocket.close()
+                break
+
+            #response =client.chat.completions.create(
+            #            model="glm-3-turbo",  # 填写需要调用的模型名称
+            #            messages=[
+            #                {"role": "user", "content": data},
+            #            ],
+            #            stream=True,
+            #        )
+            # result = dict()
+            for line in res_arr:
+                #res_str = line.choices[0].delta
+                #if isinstance(res_str, ChoiceDelta):
+                #    content = res_str.content
+                #    print(content)
+                #    await websocket.send_text(content)
+                print(line)
+                await websocket.send_text(line)
+
+
     except WebSocketDisconnect:
         return

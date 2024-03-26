@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { NAutoComplete, NButton, NInput, useDialog, useMessage } from 'naive-ui'
+import { NAutoComplete, NButton, NInput, messageDark, useDialog, useMessage } from 'naive-ui'
 import html2canvas from 'html2canvas'
 import { Message } from './components'
 import { useScroll } from './hooks/useScroll'
@@ -16,7 +16,7 @@ import { useChatStore, usePromptStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
 
-const SERVER_RUL = import.meta.env.VITE_APP_API_BASE_URL
+const SERVER_RUL = import.meta.env.VITE_APP_API_WS_URL
 
 let socket = new WebSocket(SERVER_RUL)
 
@@ -95,8 +95,135 @@ async function onConversation() {
     options = { ...lastContext }
 
 */
-  socket.send(message)
+  socket.send("djfdkjfkd")
 }
+
+
+let last_context = ''
+socket.addEventListener("message", (event)=>{
+  try {
+
+    let current_text = event.data
+    let current_show_text = last_context
+
+
+    if (current_text.startsWith("[BEG]"))
+    {   
+      current_text = current_text.substring(5, current_text.length)
+      if (current_text.endsWith("[DONE]"))
+      {
+          last_context += current_text.substring(0, current_text.length-6)
+          current_show_text = last_context
+          last_context=''
+
+      }
+      else 
+      {
+        last_context += current_text
+        current_show_text = last_context
+      }
+
+      addChat(
+      +uuid,
+      {
+        dateTime: new Date().toLocaleString(),
+        text: current_show_text,
+        loading: true,
+        inversion: false,
+        error: false,
+        conversationOptions: null,
+        requestOptions: { prompt: 'None', options: null },
+      },
+    )
+    scrollToBottom()
+
+
+    updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })
+    }
+    else 
+    {
+      if (current_text.endsWith("[DONE]"))
+      {
+          last_context += current_text.substring(0, current_text.length-6)
+          current_show_text = last_context
+          last_context=''
+
+      }
+      else 
+      {
+        last_context += current_text
+        current_show_text = last_context
+      }
+
+      updateChat(
+      +uuid,
+      current_show_text.length - 1,
+      {
+        dateTime: new Date().toLocaleString(),
+        text: current_show_text,
+        inversion: false,
+        error: true,
+        loading: false,
+        conversationOptions: null,
+        requestOptions: { prompt: 'none', options:null },
+      },
+    )
+    updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })
+      scrollToBottomIfAtBottom()
+    }
+
+
+
+  }
+  catch (error: any) {
+    const errorMessage = error?.message ?? t('common.wrong')
+
+    if (error.message === 'canceled') {
+      updateChatSome(
+        +uuid,
+        dataSources.value.length - 1,
+        {
+          loading: false,
+        },
+      )
+      scrollToBottomIfAtBottom()
+      return
+    }
+
+    const currentChat = getChatByUuidAndIndex(+uuid, dataSources.value.length - 1)
+
+    if (currentChat?.text && currentChat.text !== '') {
+      updateChatSome(
+        +uuid,
+        dataSources.value.length - 1,
+        {
+          text: `${currentChat.text}\n[${errorMessage}]`,
+          error: false,
+          loading: false,
+        },
+      )
+      return
+    }
+
+    updateChat(
+      +uuid,
+      dataSources.value.length - 1,
+      {
+        dateTime: new Date().toLocaleString(),
+        text: errorMessage,
+        inversion: false,
+        error: true,
+        loading: false,
+        conversationOptions: null,
+        requestOptions: { prompt: 'none', options:null },
+      },
+    )
+    scrollToBottomIfAtBottom()
+  }
+  finally {
+    loading.value = false
+  }
+})
 
 async function onRegenerate(index: number) {
   if (loading.value)
