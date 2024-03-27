@@ -29,4 +29,5 @@ coverage
 *.sw?
 
 UI/chat_web_ui/node_modules/*
+*.pyc
 

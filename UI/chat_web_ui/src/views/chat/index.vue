@@ -115,12 +115,15 @@ socket.addEventListener("message", (event)=>{
           last_context += current_text.substring(0, current_text.length-6)
           current_show_text = last_context
           last_context=''
+          console.log(current_text)
 
       }
       else 
       {
         last_context += current_text
         current_show_text = last_context
+        console.log(current_text)
+
       }
 
       addChat(
@@ -138,7 +141,7 @@ socket.addEventListener("message", (event)=>{
     scrollToBottom()
 
 
-    updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })
+    //updateChatSome(+uuid, 0, { loading: false })
     }
     else 
     {
@@ -147,17 +150,19 @@ socket.addEventListener("message", (event)=>{
           last_context += current_text.substring(0, current_text.length-6)
           current_show_text = last_context
           last_context=''
+          console.log("not beg"+current_text +"done")
 
       }
       else 
       {
         last_context += current_text
         current_show_text = last_context
+        console.log("bot beg"+current_text)
       }
-
-      updateChat(
+  
+        updateChat(
       +uuid,
-      current_show_text.length - 1,
+      0,
       {
         dateTime: new Date().toLocaleString(),
         text: current_show_text,
@@ -168,8 +173,27 @@ socket.addEventListener("message", (event)=>{
         requestOptions: { prompt: 'none', options:null },
       },
     )
-    updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })
+    scrollToBottom()
+
+    //scrollToBottomIfAtBottom()
+      /*
+    addChat(
+            +uuid,
+      {
+        dateTime: new Date().toLocaleString(),
+        text: current_show_text,
+        loading: true,
+        inversion: false,
+        error: false,
+        conversationOptions: null,
+        requestOptions: { prompt: 'None', options: null },
+      },
+    )
+    scrollToBottom()
+
+
       scrollToBottomIfAtBottom()
+      */
     }
 
 
