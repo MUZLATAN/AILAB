@@ -101,20 +101,56 @@ export const useChatStore = defineStore('chat-store', {
           this.chat.push({ uuid, data: [chat] })
           this.active = uuid
           this.recordState()
+          return 0
         }
         else {
           this.chat[0].data.push(chat)
           if (this.history[0].title === t('chat.newChatTitle'))
             this.history[0].title = chat.text
           this.recordState()
+          return this.chat[0].data.length-1
         }
+      }else 
+      {
+        const index = this.chat.findIndex(item => item.uuid === uuid)
+        console.log("addChatByUuid index: "+ index + " uuid: "+ uuid)
+        if (index !== -1) {
+          this.chat[index].data.push(chat)
+          if (this.history[index].title === t('chat.newChatTitle'))
+            this.history[index].title = chat.text
+          this.recordState()
+          return this.chat[index].data.length-1
+        }
+        return -1
       }
 
-      const index = this.chat.findIndex(item => item.uuid === uuid)
-      if (index !== -1) {
-        this.chat[index].data.push(chat)
-        if (this.history[index].title === t('chat.newChatTitle'))
-          this.history[index].title = chat.text
+    },
+
+
+
+    /*
+    	interface ChatState {
+		    active: number | null
+		    usingContext: boolean;
+		    history: History[]
+		    chat: { uuid: number; data: Chat[] }[]
+	    }
+      这里的this 指代的就是ChatState 里面的成员包含
+      : history 是History类型的数组
+      : chat 是{ uuid: number; data: Chat[] }类型的数组
+      其中chat 里面有两个成员包含
+      : data 是Chat类型的数组
+      : uuid 是number类型
+
+      于是如果只更新某一个气泡里面的内容需要知道对应的this.chat的索引和this.chat[chatIndex].data的索引
+      于是我们在addChatByUuid的时候返回了添加的时候，的气泡的this.chat[chatIndex].data的索引
+
+    */
+    updateChatByUuid1(uuid: number, index: number, msg: string) 
+    {
+      const chatIndex = this.chat.findIndex(item => item.uuid === uuid)
+      if (chatIndex !== -1) {
+        this.chat[chatIndex].data[index].text= msg
         this.recordState()
       }
     },
@@ -127,6 +163,8 @@ export const useChatStore = defineStore('chat-store', {
         }
         return
       }
+
+      console.log("updateChatByUuid index: "+ index + " uuid: "+ uuid)
 
       const chatIndex = this.chat.findIndex(item => item.uuid === uuid)
       if (chatIndex !== -1) {

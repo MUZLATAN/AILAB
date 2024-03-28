@@ -4,12 +4,10 @@ import dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from apps.users import router as users_router
 from apps.openai import router as openai_router
 from apps.ChatGLM import router as chatglm_router
 
 app = FastAPI()
-app.include_router(users_router)
 app.include_router(openai_router)
 app.include_router(chatglm_router)
 
@@ -38,7 +36,7 @@ def is_not_empty_string(s):
 
 def current_model():
     # 假设此处有获取当前模型的逻辑
-    return "ChatGPTAPI"
+    return ""
 
 @app.post("/session")
 async def create_session():
@@ -50,4 +48,4 @@ async def create_session():
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run("main:app", reload=True, host="127.0.0.1", port=3002)
+    uvicorn.run("main:app", reload=True, host="0.0.0.0", port=3002)

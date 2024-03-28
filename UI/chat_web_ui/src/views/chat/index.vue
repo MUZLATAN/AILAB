@@ -31,7 +31,7 @@ const ms = useMessage()
 const chatStore = useChatStore()
 
 const { isMobile } = useBasicLayout()
-const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
+const { addChat, updateChat, updateChat1, updateChatSome, getChatByUuidAndIndex } = useChat()
 const { scrollRef, scrollToBottom, scrollToBottomIfAtBottom } = useScroll()
 const { usingContext, toggleUsingContext } = useUsingContext()
 
@@ -70,7 +70,6 @@ async function onConversation() {
     return
 
   controller = new AbortController()
-
   addChat(
     +uuid,
     {
@@ -84,23 +83,15 @@ async function onConversation() {
   )
   scrollToBottom()
 
-  /*
-  loading.value = true
-  prompt.value = ''
 
-  let options: Chat.ConversationRequest = {}
-  const lastContext = conversationList.value[conversationList.value.length - 1]?.conversationOptions
-
-  if (lastContext && usingContext.value)
-    options = { ...lastContext }
-
-*/
-  socket.send("djfdkjfkd")
+  socket.send(message)
 }
 
 
 let last_context = ''
+let current_bubble_index = -1
 socket.addEventListener("message", (event)=>{
+  
   try {
 
     let current_text = event.data
@@ -115,18 +106,18 @@ socket.addEventListener("message", (event)=>{
           last_context += current_text.substring(0, current_text.length-6)
           current_show_text = last_context
           last_context=''
-          console.log(current_text)
+          //console.log("beg :" +current_show_text+" :done")
 
       }
       else 
       {
         last_context += current_text
         current_show_text = last_context
-        console.log(current_text)
+        //console.log("beg: " + current_show_text)
 
       }
 
-      addChat(
+      current_bubble_index = addChat(
       +uuid,
       {
         dateTime: new Date().toLocaleString(),
@@ -139,9 +130,6 @@ socket.addEventListener("message", (event)=>{
       },
     )
     scrollToBottom()
-
-
-    //updateChatSome(+uuid, 0, { loading: false })
     }
     else 
     {
@@ -150,54 +138,20 @@ socket.addEventListener("message", (event)=>{
           last_context += current_text.substring(0, current_text.length-6)
           current_show_text = last_context
           last_context=''
-          console.log("not beg"+current_text +"done")
+          //console.log("not beg: "+current_show_text +" :done")
 
       }
       else 
       {
         last_context += current_text
         current_show_text = last_context
-        console.log("bot beg"+current_text)
+        //console.log("bot beg: "+current_show_text)
       }
   
-        updateChat(
-      +uuid,
-      0,
-      {
-        dateTime: new Date().toLocaleString(),
-        text: current_show_text,
-        inversion: false,
-        error: true,
-        loading: false,
-        conversationOptions: null,
-        requestOptions: { prompt: 'none', options:null },
-      },
-    )
-    scrollToBottom()
+      updateChat1(+uuid, current_bubble_index, current_show_text)
+      scrollToBottom()
 
-    //scrollToBottomIfAtBottom()
-      /*
-    addChat(
-            +uuid,
-      {
-        dateTime: new Date().toLocaleString(),
-        text: current_show_text,
-        loading: true,
-        inversion: false,
-        error: false,
-        conversationOptions: null,
-        requestOptions: { prompt: 'None', options: null },
-      },
-    )
-    scrollToBottom()
-
-
-      scrollToBottomIfAtBottom()
-      */
     }
-
-
-
   }
   catch (error: any) {
     const errorMessage = error?.message ?? t('common.wrong')

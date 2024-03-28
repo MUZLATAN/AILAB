@@ -1,1 +1,0 @@
-ApiModel = 'ChatGPTAPI' | 'ChatGPTUnofficialProxyAPI' | undefined
